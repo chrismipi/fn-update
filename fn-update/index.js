@@ -1,18 +1,19 @@
-require('dotenv').config()
+// require('dotenv').config()
+const { CosmosClient } = require("@azure/cosmos");
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
     try {
-        const endpoint = process.env.ACCOUNT_URI;
-        const key = process.env.ACCOUNT_KEY;
+        const endpoint = process.env['ACCOUNT_URI'];
+        const key = process.env['ACCOUNT_KEY'];
 
-        const client = new CosmosClient({ endpoint, key });
+        const client = new CosmosClient({ endpoint: endpoint, key: key });
         const { database } = await client.databases.createIfNotExists({ id: 'ToDoDB' });
         const { container } = await database.containers.createIfNotExists({ id: 'Actions' });
 
         const title = (req.query.title || (req.body && req.body.title));
         const complete = (req.query.complete || (req.body && req.body.complete));
-        const id = context.bindingData.id;
+        const id = (req.query.id || (req.body && req.body.id));
 
         const querySpec = {
         query: 'SELECT * FROM Actions f WHERE  f.id = @id',
@@ -36,6 +37,7 @@ module.exports = async function (context, req) {
             body: 'Saved'
         };
     } catch(error) {
+        context.log('error ', error);
         context.res = {
             status: 500, /* Defaults to 200 */
             body: error

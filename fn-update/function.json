@@ -6,10 +6,9 @@
       "direction": "in",
       "name": "req",
       "methods": [
-        "get",
-        "post"
+        "put"
       ],
-      "route": "/{id:int?}"
+      "route": "actions"
     },
     {
       "type": "http",
